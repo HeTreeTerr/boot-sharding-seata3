@@ -8,9 +8,10 @@
 
 <!--image list begin-->
 <div th:each="orderone:${orderlist}" style="border-bottom-style:solid;  border-bottom-width: 1px; width:990px;height:60px;font-size:16px;overflow: hidden;border-bottom-color: #eeeeee;">
-    <div style="float:left;width:100px;overflow: hidden;" th:text="${orderone.orderId}"></div>
+    <div style="float:left;width:200px;overflow: hidden;" th:text="${orderone.orderId}"></div>
     <div style="float:left;width:200px;height:60px;overflow: hidden;" th:text="${orderone.goodsName}"></div>
-    <div style="float:left;width:160px;overflow: hidden;" ><a th:href="@{/order/info/(orderid=${orderone.orderId})}">detail </a> </div>
+    <div style="float:left;width:200px;height:60px;overflow: hidden;" th:text="${orderone.changeAmount}"></div>
+    <div style="float:left;width:260px;overflow: hidden;" ><a th:href="@{/order/info/(orderid=${orderone.orderId})}">detail </a> </div>
 </div>
 <!--image list   end-->
 

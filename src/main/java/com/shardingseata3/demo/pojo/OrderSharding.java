@@ -17,4 +17,12 @@ public class OrderSharding {
     public void setGoodsName(String goodsName) {
         this.goodsName = goodsName;
     }
+
+    private Integer changeAmount;
+    public Integer getChangeAmount() {
+        return changeAmount;
+    }
+    public void setChangeAmount(Integer changeAmount) {
+        this.changeAmount = changeAmount;
+    }
 }

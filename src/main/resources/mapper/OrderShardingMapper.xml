@@ -5,9 +5,9 @@
         select * from t_order order by orderId desc
 	</select>
     <insert id="insertOneOrder" parameterType="com.shardingseata3.demo.pojo.OrderSharding" useGeneratedKeys="true" keyProperty="orderId" >
-		insert into t_order(orderId,goodsName)
+		insert into t_order(goodsName,changeAmount)
 		values(
-			#{orderId},#{goodsName}
+			#{goodsName},#{changeAmount}
 		)
      </insert>
 </mapper>

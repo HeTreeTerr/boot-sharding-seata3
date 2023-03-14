@@ -73,18 +73,20 @@ public class HomeController {
     @GetMapping("/addorder")
     @ResponseBody
     @GlobalTransactional(timeoutMills = 300000,rollbackFor = Exception.class)
-    public String addOrder(@RequestParam(value="orderid",required = true,defaultValue = "0") Long orderId,
+    public String addOrder(@RequestParam(value="goodsId",required = true,defaultValue = "0") Long goodsId,
+                           @RequestParam(value="goodsNum",required = true,defaultValue = "0") Integer goodsNum,
             @RequestParam(value="isfail",required = true,defaultValue = "0") int isFail
                            )  throws SQLException, IOException {
 
-        String goodsId = "3";
-        String goodsNum = "1";
-
-        String goodsName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+        TransactionTypeHolder.set(TransactionType.BASE);
+        Goods goodsQuery = goodsMapper.selectOneGoods(goodsId);
+        String goodsName = goodsQuery.getGoodsName() + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
 
         OrderSharding orderOne = new OrderSharding();
-        orderOne.setOrderId(orderId);
+        //名称
         orderOne.setGoodsName(goodsName);
+        //数量
+        orderOne.setChangeAmount(goodsNum);
 
         TransactionTypeHolder.set(TransactionType.BASE);
         int resIns = orderShardingMapper.insertOneOrder(orderOne);
@@ -92,8 +94,7 @@ public class HomeController {
 
 
         TransactionTypeHolder.set(TransactionType.BASE);
-        int count = -1;
-        int res = goodsMapper.updateGoodsStock(Long.parseLong(goodsId),count);
+        int res = goodsMapper.updateGoodsStock(goodsId, -goodsNum);
         System.out.println("res:"+res);
 
         if (isFail == 1) {
@@ -112,30 +113,22 @@ public class HomeController {
     @GetMapping("/addorderrest")
     @ResponseBody
     @GlobalTransactional(timeoutMills = 300000,rollbackFor = Exception.class)
-    public String addOrderrest(@RequestParam(value="orderid",required = true,defaultValue = "0") Long orderId,
+    public String addOrderrest(@RequestParam(value="goodsId",required = true,defaultValue = "0") Long goodsId,
+                               @RequestParam(value="goodsNum",required = true,defaultValue = "0") Integer goodsNum,
                            @RequestParam(value="isfail",required = true,defaultValue = "0") int isFail
     )  throws SQLException, IOException {
 
-        String goodsId = "3";
-        String goodsNum = "1";
-
-        String goodsName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+        TransactionTypeHolder.set(TransactionType.BASE);
+        Goods goodsQuery = goodsMapper.selectOneGoods(goodsId);
+        String goodsName = goodsQuery.getGoodsName() + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
 
         OrderSharding orderOne = new OrderSharding();
-        orderOne.setOrderId(orderId);
         orderOne.setGoodsName(goodsName);
+        orderOne.setChangeAmount(goodsNum);
 
         TransactionTypeHolder.set(TransactionType.BASE);
         int resIns = orderShardingMapper.insertOneOrder(orderOne);
         System.out.println("orderId:"+orderOne.getOrderId());
-
-
-        /*
-        TransactionTypeHolder.set(TransactionType.BASE);
-        int count = -1;
-        int res = goodsMapper.updateGoodsStock(Long.parseLong(goodsId),count);
-        System.out.println("res:"+res);
-        */
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -145,10 +138,7 @@ public class HomeController {
         HttpHeaders headers = new HttpHeaders();
         headers.add(RootContext.KEY_XID, xid);
 
-        //System.out.println("xid not null");
-        //String urlAddOrder = "http://127.0.0.1:8080/order/orderadd/"+goodsId+"/"+goodsNum+"/";
-
-        String goodsUPNum = "-1";
+        String goodsUPNum = new Integer(-goodsNum).toString();
         String urlUpStock = "http://127.0.0.1:8080/goods/goodsstock/"+goodsId+"/"+goodsUPNum+"/";
         String resultUp = restTemplate.postForObject(urlUpStock,new HttpEntity<String>(headers),String.class);
         if (!SUCCESS.equals(resultUp)) {

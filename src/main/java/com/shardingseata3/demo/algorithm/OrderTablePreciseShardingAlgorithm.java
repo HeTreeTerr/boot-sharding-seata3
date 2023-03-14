@@ -4,6 +4,7 @@ import org.apache.shardingsphere.api.sharding.standard.PreciseShardingAlgorithm;
 import org.apache.shardingsphere.api.sharding.standard.PreciseShardingValue;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.util.Collection;
 
 @Component
@@ -11,19 +12,15 @@ public class OrderTablePreciseShardingAlgorithm implements PreciseShardingAlgori
     @Override
     public String doSharding(Collection<String> availableTargetNames, PreciseShardingValue<Long> shardingValue) {
         //System.out.println("--------==================doSharding");
-
+        String logicTableName = shardingValue.getLogicTableName();
         Long curValue = shardingValue.getValue();
-        String curTable = "";
-        if (curValue > 0 && curValue<=100) {
-            curTable = "t_order_1";
-        } else if (curValue > 100 && curValue<=200) {
-            curTable = "t_order_2";
-        } else if (curValue > 200 && curValue<=300) {
-            curTable = "t_order_3";
-        } else {
-            curTable = "t_order_4";
+        BigInteger shardingValueB = BigInteger.valueOf(curValue);
+        BigInteger resB = (shardingValueB.mod(new BigInteger("2"))).add(new BigInteger("1"));
+        String curTable = logicTableName + "_" + resB;
+        if(availableTargetNames.contains(curTable)){
+            return curTable;
         }
-        return curTable;
+        throw new UnsupportedOperationException("route "+ curTable +" is not supported ,please check your config");
     }
 
 }

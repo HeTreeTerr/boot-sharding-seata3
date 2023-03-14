@@ -4,6 +4,7 @@ import org.apache.shardingsphere.api.sharding.standard.PreciseShardingAlgorithm;
 import org.apache.shardingsphere.api.sharding.standard.PreciseShardingValue;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.util.Collection;
 
 @Component
@@ -12,12 +13,13 @@ public class DatabasePreciseShardingAlgorithm implements PreciseShardingAlgorith
     public String doSharding(Collection<String> availableTargetNames, PreciseShardingValue<Long> shardingValue) {
         System.out.println("------------------select database name");
         Long curValue = shardingValue.getValue();
-        String curBase = "";
-        if (curValue > 0 && curValue<=200) {
-            curBase = "saleorder01";
-        } else {
-            curBase = "saleorder02";
+        BigInteger shardingValueB = new BigInteger(new Integer(curValue.toString().hashCode()).toString());
+        BigInteger resB = (shardingValueB.mod(new BigInteger("2"))).add(new BigInteger("1"));
+        String curBase = "saleorder0"+resB;
+        if(availableTargetNames.contains(curBase)){
+            return curBase;
         }
-        return curBase;
+        //couse_1, course_2
+        throw new UnsupportedOperationException("route "+ curBase +" is not supported ,please check your config");
     }
 }
