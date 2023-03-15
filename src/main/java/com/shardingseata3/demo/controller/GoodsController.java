@@ -5,6 +5,8 @@ import com.shardingseata3.demo.pojo.Goods;
 import org.apache.shardingsphere.transaction.core.TransactionType;
 import org.apache.shardingsphere.transaction.core.TransactionTypeHolder;
 import org.mybatis.spring.annotation.MapperScan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,8 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/goods")
 public class GoodsController {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final String SUCCESS = "SUCCESS";
     private static final String FAIL = "FAIL";
@@ -29,7 +33,7 @@ public class GoodsController {
 
         TransactionTypeHolder.set(TransactionType.BASE);
          int res = goodsMapper.updateGoodsStock(goodsId,count);
-         System.out.println("res:"+res);
+         logger.info("res:{}",res);
 
          if (res>0) {
              return SUCCESS;

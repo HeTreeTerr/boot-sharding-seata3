@@ -20,6 +20,8 @@ import org.apache.shardingsphere.transaction.annotation.ShardingTransactionType;
 import org.apache.shardingsphere.transaction.core.TransactionType;
 import org.apache.shardingsphere.transaction.core.TransactionTypeHolder;
 import org.mybatis.spring.annotation.MapperScan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpEntity;
@@ -47,6 +49,8 @@ import java.util.concurrent.locks.LockSupport;
 //@MapperScan("com.shardingseata3.demo.mapper.sharding")
 public class HomeController {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private static final String SUCCESS = "SUCCESS";
     private static final String FAIL = "FAIL";
 
@@ -65,7 +69,7 @@ public class HomeController {
         model.addAttribute("orderlist",orderList);
         PageInfo<OrderSharding> pageInfo = new PageInfo<>(orderList);
         model.addAttribute("pageInfo", pageInfo);
-        System.out.println("------------------------size:"+orderList.size());
+        logger.info("------------------------size:{}",orderList.size());
         return "order/list";
     }
 
@@ -90,12 +94,12 @@ public class HomeController {
 
         TransactionTypeHolder.set(TransactionType.BASE);
         int resIns = orderShardingMapper.insertOneOrder(orderOne);
-        System.out.println("orderId:"+orderOne.getOrderId());
+        logger.info("orderId:{}",orderOne.getOrderId());
 
 
         TransactionTypeHolder.set(TransactionType.BASE);
         int res = goodsMapper.updateGoodsStock(goodsId, -goodsNum);
-        System.out.println("res:"+res);
+        logger.info("res:{}",res);
 
         if (isFail == 1) {
             int divide = 0;
@@ -128,12 +132,12 @@ public class HomeController {
 
         TransactionTypeHolder.set(TransactionType.BASE);
         int resIns = orderShardingMapper.insertOneOrder(orderOne);
-        System.out.println("orderId:"+orderOne.getOrderId());
+        logger.info("orderId:{}",orderOne.getOrderId());
 
         RestTemplate restTemplate = new RestTemplate();
 
         String xid = RootContext.getXID();
-        System.out.println("xid before send:"+xid);
+        logger.info("xid before send:{}",xid);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(RootContext.KEY_XID, xid);
